@@ -27,13 +27,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseRouting();
 app.MapControllers();
+app.UseAuthorization();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<ChatHub>("/chatHub");
+    endpoints.MapHub<UsuariosHub>("/UsuariosHub");
 });
 
 app.Run();
