@@ -11,13 +11,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 var app = builder.Build();
 
-app.UseCors(builder => {
-    builder.WithOrigins("http://localhost:4200") // Aquí debes especificar las URLs permitidas
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials(); // Permite las credenciales en la solicitud
-});
-
+app.UseCors(builder => builder
+.AllowAnyHeader()
+.AllowAnyMethod()
+.SetIsOriginAllowed((host) => true)
+.AllowCredentials());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
