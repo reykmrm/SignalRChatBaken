@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SignalRChatGPT.Modelos;
 using SignalRChatGPT.Modelos.DTOs;
+using SignalRChatGPT.Services;
 using System.Data;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -12,33 +14,45 @@ namespace SignalRChatGPT.Hubs
     public class UsuariosHub : Hub
     {
         public readonly IConfiguration _configuration;
-        public readonly ChatBacapContext _contex;
-        public UsuariosHub(IConfiguration configuration, ChatBacapContext contex)
+        private readonly UserService _userService;
+        public UsuariosHub(IConfiguration configuration, UserService userService)
         {
             _configuration = configuration;
-            _contex = contex;
+            _userService = userService;
         }
+
+        //public async Task GetAllUsers()
+        //{
+        //    List<Usuario> users = new List<Usuario>();
+        //    using var connection = new SqlConnection(System.Configuration.GetConnectionString("DefaultConnection"));
+        //        var query = "SELECT * FROM Usuarios";
+        //    users = connection.Query<Usuario>(query).ToList();
+        //    await Clients.All.SendAsync("GetAllUsersClient", users);
+        //}
 
         public async Task GetAllUsers()
         {
-            List<Usuario> users = new List<Usuario>();
-            users = _contex.Usuarios.ToList();
-            await Clients.All.SendAsync("GetAllUsersClient", " " + users);
+            var result = await _userService.GetAllUsers();
+            await Clients.All.SendAsync("GetAllUsersClient", result);
+        }
 
-        }
-        public async Task GetUserById(int id)
-        {
-            Usuario usuario = new Usuario();
-            usuario = await _contex.Usuarios.FirstOrDefaultAsync(x => x.Id == id);
-            string message = "";
-            if (usuario is not null)
-            {
-                message = "Encontrado";
-                await Clients.All.SendAsync("GetUserById", " " + usuario, message);
-            }
-            message = "No se encontro el usuario";
-            await Clients.All.SendAsync("GetUserById", " " + usuario, message);
-        }
+
+
+
+
+        //public async Task GetUserById(int id)
+        //{
+        //    Usuario usuario = new Usuario();
+        //    usuario = await _contex.Usuarios.FirstOrDefaultAsync(x => x.Id == id);
+        //    string message = "";
+        //    if (usuario is not null)
+        //    {
+        //        message = "Encontrado";
+        //        await Clients.All.SendAsync("GetUserById", " " + usuario, message);
+        //    }
+        //    message = "No se encontro el usuario";
+        //    await Clients.All.SendAsync("GetUserById", " " + usuario, message);
+        //}
         public async Task CreateUser(UsuariosDTO user)
         {
             Usuario usuario = new Usuario()
@@ -63,10 +77,10 @@ namespace SignalRChatGPT.Hubs
         }
         
 
-        public async Task EditUser()
-        {
+        //public async Task EditUser()
+        //{
 
-        }
+        //}
 
         
 
