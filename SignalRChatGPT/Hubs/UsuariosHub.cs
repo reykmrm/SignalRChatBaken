@@ -35,11 +35,6 @@ namespace SignalRChatGPT.Hubs
             var result = await _userService.GetAllUsers();
             await Clients.All.SendAsync("GetAllUsersClient", result);
         }
-
-
-
-
-
         public async Task<UsuariosDTO> GetUserById(int id)
         {
             UsuariosDTO userDTO = await _userService.GetUserById(id);
