@@ -40,19 +40,11 @@ namespace SignalRChatGPT.Hubs
 
 
 
-        //public async Task GetUserById(int id)
-        //{
-        //    Usuario usuario = new Usuario();
-        //    usuario = await _contex.Usuarios.FirstOrDefaultAsync(x => x.Id == id);
-        //    string message = "";
-        //    if (usuario is not null)
-        //    {
-        //        message = "Encontrado";
-        //        await Clients.All.SendAsync("GetUserById", " " + usuario, message);
-        //    }
-        //    message = "No se encontro el usuario";
-        //    await Clients.All.SendAsync("GetUserById", " " + usuario, message);
-        //}
+        public async Task<UsuariosDTO> GetUserById(int id)
+        {
+            UsuariosDTO userDTO = await _userService.GetUserById(id);
+            return userDTO;
+        }
         public async Task CreateUser(UsuariosDTO user)
         {
             Usuario usuario = new Usuario()
