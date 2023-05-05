@@ -41,6 +41,10 @@ namespace SignalRChatGPT.Services
             };
             return userDto;
         }
+        public async Task<Usuario> GetById(int id)
+        {
+            return await _context.Usuarios.FirstOrDefaultAsync(x => x.Id == id);                      
+        }
         public async Task<bool> Create(Usuario user)
         {
             await _context.Usuarios.AddAsync(user);

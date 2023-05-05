@@ -20,25 +20,16 @@ namespace SignalRChatGPT.Hubs
             _configuration = configuration;
             _userService = userService;
         }
-
-        //public async Task GetAllUsers()
-        //{
-        //    List<Usuario> users = new List<Usuario>();
-        //    using var connection = new SqlConnection(System.Configuration.GetConnectionString("DefaultConnection"));
-        //        var query = "SELECT * FROM Usuarios";
-        //    users = connection.Query<Usuario>(query).ToList();
-        //    await Clients.All.SendAsync("GetAllUsersClient", users);
-        //}
-
+       
         public async Task GetAllUsers()
         {
             var result = await _userService.GetAllUsers();
             await Clients.All.SendAsync("GetAllUsersClient", result);
         }
-        public async Task<UsuariosDTO> GetUserById(int id)
+        public async Task GetUserById(int id)
         {
             UsuariosDTO userDTO = await _userService.GetUserById(id);
-            return userDTO;
+            await Clients.All.SendAsync("UserById", userDTO);
         }
         public async Task CreateUser(UsuariosDTO user)
         {
@@ -62,15 +53,59 @@ namespace SignalRChatGPT.Hubs
             }
 
         }
-        
+        public async Task EditUser(int id, UsuariosDTO userEdit)
+        {
+            var user=await _userService.GetById(id);
+            user.Nombre = userEdit.Nombre;
+            user.Usuario1=userEdit.Usuario;
+            user.Clave=userEdit.Clave;
+            user.Imagen=userEdit.Imagen;            
+            //tranasformo a usuario           
+            try
+            {               
+               bool save= await _userService.Update(user);
+                if (save == true)
+                {
+                    string message = "Usuario Editado Correctamente";
+                    await Clients.All.SendAsync("UserEditado", message);
+                }
+                else
+                {
+                    string message = "El Usuario no pudo ser editado";
+                    await Clients.All.SendAsync("UserEditado", message);
+                }                
+            }
+            catch(Exception e)
+            {
+                string message = e.Message;
+                await Clients.All.SendAsync("UserEditado", message);
+            }
 
-        //public async Task EditUser()
-        //{
-
-        //}
-
-        
-
+        }
+        public async Task EliminarUser(int id)
+        {
+            var userDelete = await _userService.GetById(id);
+            try
+            {
+                bool delete =await _userService.Delete(userDelete);
+                if (delete == true)
+                {
+                    string message = "Usuario Eliminado Correctamente";
+                    await Clients.All.SendAsync("UserEliminado", message);
+                }
+                else
+                {
+                    string message = "El Usuario no pudo ser Eliminado";
+                    await Clients.All.SendAsync("UserEliminado", message);
+                }
+            }
+            catch(Exception e)
+            {
+                string message =e.Message;
+                await Clients.All.SendAsync("UserEliminado", message);
+            }
+        }
+                      
         public async Task<bool> RegisterUser(Usuario user)
         {
             //using (IDbConnection conexion = new SqlConnection(ObtenerCadenaConexion()))
@@ -87,23 +122,6 @@ namespace SignalRChatGPT.Hubs
                 var result = await conexion.ExecuteAsync("dbo.CreateUser", param: parametros, commandType: CommandType.StoredProcedure);
                 return result > 0;
             }
-        }
-
-
-        //public async Task<Usuarios>GetById(int id)
-        //{
-        //    //using (IDbConnection conexion = new SqlConnection(ObtenerCadenaConexion()))
-        //    using (SqlConnection conexion = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-        //    {
-        //        conexion.Open();
-        //        var parametros = new DynamicParameters();
-
-        //        parametros.Add("idUser", id);
-
-        //        var result = await conexion.QueryAsync<Usuarios > ("dbo.GetUserById", param: parametros, commandType: CommandType.StoredProcedure);
-        //        return result;
-        //    }
-
-        //}
+        }       
     }
 }
