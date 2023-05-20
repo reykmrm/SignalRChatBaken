@@ -1,8 +1,11 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using SignalRChatGPT.Modelos;
 using SignalRChatGPT.Modelos.DTOs;
 using SignalRChatGPT.Services;
@@ -31,8 +34,9 @@ namespace SignalRChatGPT.Hubs
             UsuariosDTO userDTO = await _userService.GetUserById(id);
             await Clients.All.SendAsync("UserById", userDTO);
         }
-        public async Task CreateUser(UsuariosDTO user)
-        {
+        
+        public async Task CreateUser( UsuariosDTO user)
+        {           
             Usuario usuario = new Usuario()
             {
                 Nombre = user.Nombre,
@@ -54,12 +58,13 @@ namespace SignalRChatGPT.Hubs
 
         }
         public async Task EditUser(int id, UsuariosDTO userEdit)
-        {
+        {            
             var user=await _userService.GetById(id);
             user.Nombre = userEdit.Nombre;
             user.Usuario1=userEdit.Usuario;
             user.Clave=userEdit.Clave;
-            user.Imagen=userEdit.Imagen;            
+            user.Imagen = userEdit.Imagen;
+            //user.Imagen=userEdit.Imagen;            
             //tranasformo a usuario           
             try
             {               

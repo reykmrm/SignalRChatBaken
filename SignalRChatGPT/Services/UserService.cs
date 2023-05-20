@@ -37,13 +37,18 @@ namespace SignalRChatGPT.Services
                 Nombre = user.Nombre,
                 Usuario = user.Usuario1,
                 Clave = user.Clave,
-                Imagen = user.Imagen
+                //Imagen = user.Imagen
             };
             return userDto;
         }
         public async Task<Usuario> GetById(int id)
         {
             return await _context.Usuarios.FirstOrDefaultAsync(x => x.Id == id);                      
+        }
+
+        public async Task<Usuario> GetUserByLogin(string user,string password)
+        {
+            return await _context.Usuarios.FirstOrDefaultAsync(x => x.Usuario1 == user && x.Clave == password);
         }
         public async Task<bool> Create(Usuario user)
         {
